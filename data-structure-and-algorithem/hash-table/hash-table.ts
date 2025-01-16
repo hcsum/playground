@@ -3,7 +3,7 @@ class HashTable {
   constructor(size = 53) {
     this.keyMap = new Array(size);
   }
-  
+
   hash(key: string) {
     let total = 0;
     const PRIME = 31;
@@ -13,8 +13,8 @@ class HashTable {
       total = (total * PRIME + value) % this.keyMap.length;
     }
     return total;
-  }  
-  
+  }
+
   set(key: string, value: any) {
     const index = this.hash(key);
     if (!this.keyMap[index]) {
@@ -27,9 +27,9 @@ class HashTable {
         }
       }
     }
-    this.keyMap[index].push([ key, value ]); // Add a new entry if the key doesn't exist
+    this.keyMap[index].push([key, value]); // Add a new entry if the key doesn't exist
   }
-  
+
   get(key: string) {
     const index = this.hash(key);
     if (this.keyMap[index]) {
@@ -41,7 +41,7 @@ class HashTable {
     }
     return undefined;
   }
-  
+
   keys() {
     const keysArr: any[] = [];
     for (let i = 0; i < this.keyMap.length; i++) {
@@ -53,7 +53,7 @@ class HashTable {
     }
     return keysArr;
   }
-  
+
   values() {
     const valuesArr: any[] = [];
     for (let i = 0; i < this.keyMap.length; i++) {
@@ -65,7 +65,7 @@ class HashTable {
     }
     return valuesArr;
   }
-  
+
   entries() {
     const entriesArr: any[] = [];
     for (let i = 0; i < this.keyMap.length; i++) {
@@ -89,7 +89,7 @@ class HashTable {
     }
     return false;
   }
-  
+
   delete(key: string) {
     const index = this.hash(key);
     if (this.keyMap[index]) {
@@ -102,7 +102,7 @@ class HashTable {
     }
     return false;
   }
-  
+
   clear() {
     this.keyMap = new Array(this.keyMap.length);
   }
