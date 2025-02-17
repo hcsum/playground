@@ -1,112 +1,92 @@
 class MyNode {
-  public key: number;
-  public value: number;
-  public next: MyNode | null;
-  public prev: MyNode | null;
-  constructor(
-    value: number,
-    key: number,
-    next: MyNode | null,
-    prev: MyNode | null,
-  ) {
-    this.value = value;
+  key: number;
+  value: number;
+  prev: MyNode | null;
+  next: MyNode | null;
+
+  constructor(key: number, value: number) {
     this.key = key;
-    this.next = next;
-    this.prev = prev;
+    this.value = value;
+    this.prev = null;
+    this.next = null;
   }
 }
 
 class LRUCache {
-  private head: MyNode | null; // LRU
-  private tail: MyNode | null; // MRU
-  private cap: number;
-  private length = 0;
-  private cache = new Map<number, MyNode>();
+  private capacity: number;
+  private cache: Map<number, MyNode>;
+  private head: MyNode; // Dummy head (most recently used)
+  private tail: MyNode; // Dummy tail (least recently used)
+
   constructor(capacity: number) {
-    this.cap = capacity;
+    this.capacity = capacity;
+    this.cache = new Map();
+    this.head = new MyNode(0, 0); // Dummy head
+    this.tail = new MyNode(0, 0); // Dummy tail
+    this.head.next = this.tail;
+    this.tail.prev = this.head;
   }
 
+  // Helper function to remove a node from the linked list
+  private remove(node: MyNode): void {
+    const prev = node.prev!;
+    const next = node.next!;
+    prev.next = next;
+    next.prev = prev;
+  }
+
+  // Helper function to insert a node at the head (most recently used)
+  private insert(node: MyNode): void {
+    const next = this.head.next!;
+    this.head.next = node;
+    node.prev = this.head;
+    node.next = next;
+    next.prev = node;
+  }
+
+  // Get the value for a key
   get(key: number): number {
-    const res = this.cache.get(key);
-    if (res) {
-      this.moveToHead(res);
-      this.log();
-      return res.value;
+    if (this.cache.has(key)) {
+      const node = this.cache.get(key)!;
+      this.remove(node); // Remove from current position
+      this.insert(node); // Move to head (most recently used)
+      return node.value;
     }
-    this.log();
-    return -1;
+    return -1; // Key not found
   }
 
+  // Add or update a key-value pair
   put(key: number, value: number): void {
-    let node = this.cache.get(key);
-    if (node) {
+    if (this.cache.has(key)) {
+      // If key exists, update its value and move it to the head
+      const node = this.cache.get(key)!;
       node.value = value;
+      this.remove(node);
+      this.insert(node);
     } else {
-      this.length++;
-      node = new MyNode(value, key, null, null);
-      this.cache.set(key, node);
-    }
-    this.moveToHead(node);
-    if (this.length > this.cap) {
-      const tail = this.removeFromTail();
-      this.cache.delete(tail!.key);
-      this.length--;
-    }
-    this.log();
-  }
+      // If key doesn't exist, create a new node
+      const newNode = new MyNode(key, value);
+      this.cache.set(key, newNode);
+      this.insert(newNode);
 
-  private moveToHead(node: MyNode) {
-    if (this.head === node) return;
-    if (!this.head) {
-      this.head = node;
-      this.tail = node;
-      return;
+      // If cache exceeds capacity, remove the least recently used node
+      if (this.cache.size > this.capacity) {
+        const lruNode = this.tail.prev!; // MyNode before the dummy tail
+        this.remove(lruNode); // Remove from the list
+        this.cache.delete(lruNode.key); // Remove from the cache
+      }
     }
-    if (node.prev) node.prev.next = node.next; // new node
-    if (node.next) node.next.prev = node.prev;
-    if (node === this.tail) {
-      this.tail = this.tail.prev;
-    }
-    node.next = this.head;
-    node.prev = null;
-    this.head.prev = node;
-    this.head = node;
-  }
-  private removeFromTail() {
-    // this.log()
-    const prev = this.tail!.prev;
-    this.tail!.prev = null;
-    prev!.next = null;
-    const oldTail = this.tail;
-    this.tail = prev;
-    return oldTail;
-  }
-
-  private log() {
-    // console.log("tail:", this.tail?.value);
-    let node = this.head;
-    let str = "";
-    while (node) {
-      str += node.value;
-      str += ",";
-      node = node.next;
-    }
-    console.log(str);
   }
 }
 
-/**
- * Your LRUCache object will be instantiated and called as such:
- * var obj = new LRUCache(capacity)
- * var param_1 = obj.get(key)
- * obj.put(key,value)
- */
-
-const obj = new LRUCache(3);
-
-obj.put(1, 1);
-obj.put(2, 2);
-obj.put(3, 3);
-obj.get(1);
-obj.put(4, 4);
-obj.get(3);
+// Example usage:
+const lruCache = new LRUCache(2);
+lruCache.put(1, 1); // Cache is {1=1}
+lruCache.put(2, 2); // Cache is {1=1, 2=2}
+console.log(lruCache.get(1)); // Returns 1 (Cache is {2=2, 1=1})
+lruCache.put(3, 3); // Evicts key 2, Cache is {1=1, 3=3}
+console.log(lruCache.get(2)); // Returns -1 (not found)
+lruCache.put(4, 4); // Evicts key 1, Cache is {3=3, 4=4}
+console.log(lruCache.get(1)); // Returns -1 (not found)
+console.log(lruCache.get(3)); // Returns 3 (Cache is {4=4, 3=3})
+console.log(lruCache.get(4)); // Returns 4 (Cache is {3=3, 4=4})

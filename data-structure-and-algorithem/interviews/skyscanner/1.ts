@@ -6,45 +6,38 @@ type Flight = {
   origin: string;
   destination: string;
   fare: number;
-}
+};
 
-const flights: Flight[] = [
-  { origin: 'KKB', destination: 'ABC', fare: 98 },
-  { origin: 'ABC', destination: 'OKK', fare: 200 },
-  { origin: 'OKK', destination: 'MLB', fare: 156 },
-  { origin: 'KKB', destination: 'PRS', fare: 400 },
-  { origin: 'LPO', destination: 'OKK', fare: 56 },
-  { origin: 'PRS', destination: 'BIO', fare: 90 },
-  { origin: 'KKB', destination: 'PPP', fare: 78 },
-  { origin: 'BIO', destination: 'OKK', fare: 66.7 },
-  { origin: 'OKK', destination: 'PPP', fare: 300.5 },
-];
+function findFlights(
+  flights: Flight[],
+  limit: number,
+  origin: string,
+): string[] {
+  // implement it
+  const result = new Set<string>();
 
-function findFlights(flights: Flight[], limit: number, origin: string): Array<Array<string>> {
-  const result: Array<Array<string>> = [];
-  const prices: number[] = [];
-
-  function buildRoute(origin: string, route: string[], routeTotal: number) {
-
+  function dfs(origin: string, limit: number) {
     for (const f of flights) {
       if (origin === f.origin) {
-        if (routeTotal + f.fare < limit) 
-          buildRoute(f.destination, [ ...route, f.destination ], routeTotal + f.fare);
+        const newLimit = limit - f.fare;
+        if (newLimit < 0) continue;
+        result.add(f.destination);
+        dfs(f.destination, newLimit);
       }
     }
-
-    result.push(route);
-    prices.push(routeTotal);
   }
 
-  buildRoute(origin, [], 0);
+  dfs(origin, limit);
 
-  console.log(result); 
-  console.log(prices); 
-  return result;
+  return Array.from(result);
 }
 
-findFlights(flights, 500, 'KKB');
+// Example usage:
+const flights: Flight[] = [
+  { origin: "A", destination: "B", fare: 50 },
+  { origin: "B", destination: "C", fare: 30 },
+  { origin: "C", destination: "D", fare: 20 },
+  { origin: "A", destination: "D", fare: 100 },
+];
 
-
-
+console.log(findFlights(flights, 100, "A")); // Output: ['B', 'C', 'D']
