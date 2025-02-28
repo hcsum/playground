@@ -1,17 +1,15 @@
-const fs = require('fs');
+const fs = require("fs");
 
-const DATA = 
-  {
-    'email': 'example@test.com',
-    'eventId': '95ea8419-a557-4cde-a175-13cb31e8eeac',
-    'smtp-id': '<14c5d75ce93.dfd.64b469@ismtpd-555>',
-    'event': 'delivered',
-    'category': 'cat facts',
-    'sg_event_id': 'sg_event_id',
-    'sg_message_id': 'sg_message_id',
-    'reason': 'something wrong'
-  };
-
+const DATA = {
+  email: "example@test.com",
+  eventId: "95ea8419-a557-4cde-a175-13cb31e8eeac",
+  "smtp-id": "<14c5d75ce93.dfd.64b469@ismtpd-555>",
+  event: "delivered",
+  category: "cat facts",
+  sg_event_id: "sg_event_id",
+  sg_message_id: "sg_message_id",
+  reason: "something wrong",
+};
 
 // const attendeeIds = [
 //   '5e074ce8-a965-4c4d-a03c-26b694d496c4',
@@ -32,45 +30,56 @@ const DATA =
 // ];
 
 const attendeeIds = [
-  '5e074ce8-a965-4c4d-a03c-26b694d496c4',
-  '19953e1b-4d7d-4693-a58e-d2a73c6d7a2e',
-  '16bf29b6-5ae3-4da7-871a-172d0c000000',
+  "5e074ce8-a965-4c4d-a03c-26b694d496c4",
+  "19953e1b-4d7d-4693-a58e-d2a73c6d7a2e",
+  "16bf29b6-5ae3-4da7-871a-172d0c000000",
 ];
 
-
-const manualEmailIds = [
-  '0319d675-7cf7-417e-8fdf-9820173902fd'
+const manualEmailIds = ["0319d675-7cf7-417e-8fdf-9820173902fd"];
+const events = [
+  "processed",
+  "dropped",
+  "delivered",
+  "deferred",
+  "bounce",
+  "click",
+  "open",
+  "spamreport",
 ];
-const events = [ 'processed', 'dropped', 'delivered', 'deferred', 'bounce', 'click', 'open', 'spamreport' ];
 
 function randomize(item) {
   const updated = { ...item };
 
   updated.event = events[Math.floor(Math.random() * events.length)];
   updated.timestamp = new Date().getTime() - Math.floor(Math.random() * 10000);
-  updated.attendeeId = attendeeIds[Math.floor(Math.random() * attendeeIds.length)];
-  updated.outreachManualEmailId = manualEmailIds[Math.floor(Math.random() * manualEmailIds.length)];
+  updated.attendeeId =
+    attendeeIds[Math.floor(Math.random() * attendeeIds.length)];
+  updated.outreachEmailId =
+    manualEmailIds[Math.floor(Math.random() * manualEmailIds.length)];
+
+  if (updated.event !== "dropped" && updated.event !== "bounce") {
+    updated.reason = null;
+  }
 
   return updated;
 }
 
-const folderPath = 'temp/'; 
+const folderPath = "temp/";
 if (!fs.existsSync(folderPath)) {
   fs.mkdirSync(folderPath);
 }
 
 let i = 0;
-let string = '';
+let string = "";
 while (i < 10) {
-  string += JSON.stringify(randomize(DATA)) + '\n';
+  string += JSON.stringify(randomize(DATA)) + "\n";
   i++;
 }
 
-
-fs.writeFile(`${folderPath}${new Date().getTime()}_uuid.json`, string, (err) => {
+fs.writeFile(`${folderPath}${new Date().getTime()}_uuid`, string, (err) => {
   if (err) {
     console.error(err);
   } else {
-    console.log('Data written to file!');
+    console.log("Data written to file!");
   }
 });

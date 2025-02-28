@@ -39,3 +39,8 @@ tar -xzf filename.tar.gz -C /path/to/directory
 # check memory usage
 
 watch -n 5 free -m
+
+# debug typescript path resolution
+
+in this case, we want to debug why the shared module is not found in the server container
+`docker compose exec server yarn tsc --traceResolution | grep "shared"`
