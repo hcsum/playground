@@ -5,24 +5,28 @@
 // `wait` milliseconds.
 const debounce = (func, wait) => {
   let timeout;
-
   return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-
+    console.log("debounce", timeout);
     clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
+    timeout = setTimeout(() => {
+      // clearTimeout(timeout);
+      func(...args);
+    }, wait);
   };
 };
 
-const sendData = debounce(() => console.log('sent'), 500);
+const sendData = debounce(() => console.log("sent"), 1000);
+// const sendData2 = debounce(() => console.log("sent2"), 2000);
 
-sendData();
-sendData();
-sendData();
-sendData();
+(async () => {
+  sendData();
+  await new Promise((resolve) => setTimeout(resolve, 800));
+  sendData();
+  await new Promise((resolve) => setTimeout(resolve, 800));
+  sendData();
+  await new Promise((resolve) => setTimeout(resolve, 800));
+  sendData();
+})();
 
 /**
  * this debounce will not clear the timeout every time it is called.

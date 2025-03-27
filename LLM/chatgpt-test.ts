@@ -3,13 +3,12 @@ import axios from "axios";
 
 dotenv.config();
 
-// OpenAI API Key
 const apiKey = process.env.OPENAI_API_KEY;
 
 const headers = {
   "Content-Type": "application/json",
   Authorization: `Bearer ${apiKey}`,
-  secret: "127b2f9d-03c4-45e1-9a81-23301ce8a6c6",
+  // secret: "127b2f9d-03c4-45e1-9a81-23301ce8a6c6",
 };
 
 interface Message {
